@@ -1,0 +1,114 @@
+heat_template_version: 2016-04-08
+
+description: Servidor web para churrops!
+
+parameters:
+
+  flavor:
+    type: string
+    description: Flavor para o servidor web
+    constraints:
+    - custom_constraint: nova.flavor
+    default: g1.micro
+  image:
+    type: string
+    description: Imagem para o servidor web
+    constraints:
+    - custom_constraint: glance.image
+    default: linux-ubuntu-16-64b-base
+  private_network:
+    type: string
+    description: Rede interna
+    constraints:
+    - custom_constraint: neutron.network
+    default: net-int1
+  private_ip:
+    type: string
+    description: IP interna do servidor
+    default: 10.0.0.200
+  key_name:
+    type: string
+    description: A chave ssh para acessar a nossa vm
+    constraints:
+    - custom_constraint: nova.keypair
+    default: devel
+  public_network:
+    type: string
+    description: Rede pública
+    constraints:
+    - custom_constraint: neutron.network
+  texto:
+    type: string
+    description: Texto exibido no site
+    default: "Churrops rules"
+
+resources:
+
+  sec_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+      - remote_ip_prefix: 0.0.0.0/0
+        protocol: icmp
+      - remote_ip_prefix: 0.0.0.0/0
+        protocol: tcp
+        port_range_min: 80
+        port_range_max: 80
+      - remote_ip_prefix: 0.0.0.0/0
+        protocol: tcp
+        port_range_min: 22
+        port_range_max: 22 
+
+  serverweb_port:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_param: private_network }
+      security_groups: [{ get_resource: sec_group }]
+
+  serverweb:
+    type: OS::Nova::Server
+    properties:
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      networks:
+        - port: { get_resource: serverweb_port }
+      user_data_format: RAW
+      key_name: { get_param: key_name }
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/bash
+            sudo -i
+            apt-get update
+            apt-get install -y apache2
+            cat <<EOF > /var/www/html/index.html
+            <html>
+            <head>
+            <title>Churrops!! o/</title>
+            </head>
+            <body>
+            <h1>Churrops!!! o/</h1>
+            <p>hostname: $(hostname)</p>
+            <p>parametro: TEXTO</p> 
+            </body>
+            </html>
+            EOF
+          params:
+            TEXTO: { get_param: texto }
+
+  floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: { get_param: public_network }
+      port_id: { get_resource: serverweb_port }
+
+outputs:
+  lburl:
+    description: URL do servidor web
+    value:
+      str_replace:
+        template: http://IP_ADDRESS
+        params:
+          IP_ADDRESS: { get_attr: [ floating_ip, floating_ip_address ] }
+    description: >
+      Esta URL é a URL "externa" que pode ser usada para acessar o servidor WEB.
