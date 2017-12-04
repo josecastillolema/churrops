@@ -34,7 +34,7 @@ parameters:
     default: devel
   public_network:
     type: string
-    description: Rede pública
+    description: Rede publica
     constraints:
     - custom_constraint: neutron.network
   texto:
