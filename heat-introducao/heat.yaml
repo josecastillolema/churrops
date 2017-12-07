@@ -26,6 +26,12 @@ parameters:
     type: string
     description: IP interna do servidor
     default: 10.0.0.200
+  key_name:
+    type: string
+    description: A chave ssh para acessar a nossa vm
+    constraints:
+    - custom_constraint: nova.keypair
+    default: devel
   public_network:
     type: string
     description: Rede publica
@@ -67,6 +73,7 @@ resources:
       networks:
         - port: { get_resource: serverweb_port }
       user_data_format: RAW
+      key_name: { get_param: key_name }
       user_data:
         str_replace:
           template: |
