@@ -1,3 +1,7 @@
+![GitHub](https://img.shields.io/github/license/josecastillolema/churrops)
+![GitHub language count](https://img.shields.io/github/languages/count/josecastillolema/churrops)
+![GitHub top language](https://img.shields.io/github/languages/top/josecastillolema/churrops)
+
 # churrops
 Alguns arquivos dos artigos do [churrops](https://churrops.io/) sobre OpenStack!
 
