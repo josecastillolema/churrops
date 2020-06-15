@@ -1,6 +1,8 @@
 ![GitHub](https://img.shields.io/github/license/josecastillolema/churrops)
 ![GitHub language count](https://img.shields.io/github/languages/count/josecastillolema/churrops)
 ![GitHub top language](https://img.shields.io/github/languages/top/josecastillolema/churrops)
+[![Requirements Status](https://requires.io/github/josecastillolema/churrops/requirements.svg?branch=master)](https://requires.io/github/josecastillolema/churrops/requirements/?branch=master)
+
 
 # churrops
 Alguns arquivos dos artigos do [churrops](https://churrops.io/) sobre OpenStack!
